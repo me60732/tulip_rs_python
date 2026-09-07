@@ -59,3 +59,8 @@ dist/
 tulip_rs.pyi
 *.md
 !README.md
+
+# -------------------------
+# Rust build config (local only)
+# -------------------------
+.cargo/config.toml
