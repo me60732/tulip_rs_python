@@ -52,37 +52,37 @@ DROP VIEW IF EXISTS rust_simd_c_tulip_performance_comparison CASCADE;
 CREATE VIEW avg_options_comparison AS
 SELECT runs.id AS run_id,
     runs.run_timestamp AS benchmark_date,
-    (runs.system_info ->> 'hostname'::text) AS hostname,
+    lower(runs.system_info ->> 'hostname'::text) AS hostname,
     ind.name AS indicator_name,
-    round(avg(CASE WHEN ((results.implementation_type)::text = 'Rust'::text) THEN results.mean_time_ns ELSE NULL::bigint END)) AS rust_avg_mean_time_ns,
-    count(DISTINCT CASE WHEN ((results.implementation_type)::text = 'Rust'::text) THEN results.options ELSE NULL::jsonb END) AS rust_options_count,
-    round(avg(CASE WHEN ((results.implementation_type)::text = 'C_tulip'::text) THEN results.mean_time_ns ELSE NULL::bigint END)) AS c_avg_mean_time_ns,
-    count(DISTINCT CASE WHEN ((results.implementation_type)::text = 'C_tulip'::text) THEN results.options ELSE NULL::jsonb END) AS c_options_count,
-    round(avg(CASE WHEN ((results.implementation_type)::text = 'talib'::text) THEN results.mean_time_ns ELSE NULL::bigint END)) AS talib_avg_mean_time_ns,
-    round(avg(CASE WHEN ((results.implementation_type)::text = 'RustKanda'::text) THEN results.mean_time_ns ELSE NULL::bigint END)) AS rustkanda_avg_mean_time_ns,
-    round(avg(CASE WHEN ((results.implementation_type)::text = 'RustTa'::text) THEN results.mean_time_ns ELSE NULL::bigint END)) AS rustta_avg_mean_time_ns,
-    count(DISTINCT CASE WHEN ((results.implementation_type)::text = 'talib'::text) THEN results.options ELSE NULL::jsonb END) AS talib_options_count,
-    count(DISTINCT CASE WHEN ((results.implementation_type)::text = 'RustKanda'::text) THEN results.options ELSE NULL::jsonb END) AS rustkanda_options_count,
-    count(DISTINCT CASE WHEN ((results.implementation_type)::text = 'RustTa'::text) THEN results.options ELSE NULL::jsonb END) AS rustta_options_count,
-    round((avg(CASE WHEN ((results.implementation_type)::text = 'C_tulip'::text) THEN results.mean_time_ns ELSE NULL::bigint END) / avg(CASE WHEN ((results.implementation_type)::text = 'Rust'::text) THEN results.mean_time_ns ELSE NULL::bigint END)), 2) AS c_to_rust_ratio,
-    round((((avg(CASE WHEN ((results.implementation_type)::text = 'Rust'::text) THEN results.mean_time_ns ELSE NULL::bigint END) - avg(CASE WHEN ((results.implementation_type)::text = 'C_tulip'::text) THEN results.mean_time_ns ELSE NULL::bigint END)) / avg(CASE WHEN ((results.implementation_type)::text = 'C_tulip'::text) THEN results.mean_time_ns ELSE NULL::bigint END)) * (100)::numeric), 2) AS rust_vs_c_percent_diff,
-    round((avg(CASE WHEN ((results.implementation_type)::text = 'talib'::text) THEN results.mean_time_ns ELSE NULL::bigint END) / avg(CASE WHEN ((results.implementation_type)::text = 'Rust'::text) THEN results.mean_time_ns ELSE NULL::bigint END)), 2) AS talib_to_rust_ratio,
-    round((avg(CASE WHEN ((results.implementation_type)::text = 'RustKanda'::text) THEN results.mean_time_ns ELSE NULL::bigint END) / avg(CASE WHEN ((results.implementation_type)::text = 'Rust'::text) THEN results.mean_time_ns ELSE NULL::bigint END)), 2) AS rustkanda_to_rust_ratio,
-    round((avg(CASE WHEN ((results.implementation_type)::text = 'RustTa'::text) THEN results.mean_time_ns ELSE NULL::bigint END) / avg(CASE WHEN ((results.implementation_type)::text = 'Rust'::text) THEN results.mean_time_ns ELSE NULL::bigint END)), 2) AS rustta_to_rust_ratio,
-    round((((avg(CASE WHEN ((results.implementation_type)::text = 'Rust'::text) THEN results.mean_time_ns ELSE NULL::bigint END) - avg(CASE WHEN ((results.implementation_type)::text = 'talib'::text) THEN results.mean_time_ns ELSE NULL::bigint END)) / avg(CASE WHEN ((results.implementation_type)::text = 'talib'::text) THEN results.mean_time_ns ELSE NULL::bigint END)) * (100)::numeric), 2) AS rust_vs_talib_percent_diff,
-    round((((avg(CASE WHEN ((results.implementation_type)::text = 'Rust'::text) THEN results.mean_time_ns ELSE NULL::bigint END) - avg(CASE WHEN ((results.implementation_type)::text = 'RustKanda'::text) THEN results.mean_time_ns ELSE NULL::bigint END)) / avg(CASE WHEN ((results.implementation_type)::text = 'RustKanda'::text) THEN results.mean_time_ns ELSE NULL::bigint END)) * (100)::numeric), 2) AS rust_vs_rustkanda_percent_diff,
-    round((((avg(CASE WHEN ((results.implementation_type)::text = 'Rust'::text) THEN results.mean_time_ns ELSE NULL::bigint END) - avg(CASE WHEN ((results.implementation_type)::text = 'RustTa'::text) THEN results.mean_time_ns ELSE NULL::bigint END)) / avg(CASE WHEN ((results.implementation_type)::text = 'RustTa'::text) THEN results.mean_time_ns ELSE NULL::bigint END)) * (100)::numeric), 2) AS rust_vs_rustta_percent_diff
+    round(avg(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust'::text)) THEN results.mean_time_ns ELSE NULL::bigint END)) AS rust_avg_mean_time_ns,
+    count(DISTINCT CASE WHEN (lower((results.implementation_type)::text) = lower('Rust'::text)) THEN results.options ELSE NULL::jsonb END) AS rust_options_count,
+    round(avg(CASE WHEN (lower((results.implementation_type)::text) = lower('C_tulip'::text)) THEN results.mean_time_ns ELSE NULL::bigint END)) AS c_avg_mean_time_ns,
+    count(DISTINCT CASE WHEN (lower((results.implementation_type)::text) = lower('C_tulip'::text)) THEN results.options ELSE NULL::jsonb END) AS c_options_count,
+    round(avg(CASE WHEN (lower((results.implementation_type)::text) = lower('talib'::text)) THEN results.mean_time_ns ELSE NULL::bigint END)) AS talib_avg_mean_time_ns,
+    round(avg(CASE WHEN (lower((results.implementation_type)::text) = lower('RustKanda'::text)) THEN results.mean_time_ns ELSE NULL::bigint END)) AS rustkanda_avg_mean_time_ns,
+    round(avg(CASE WHEN (lower((results.implementation_type)::text) = lower('RustTa'::text)) THEN results.mean_time_ns ELSE NULL::bigint END)) AS rustta_avg_mean_time_ns,
+    count(DISTINCT CASE WHEN (lower((results.implementation_type)::text) = lower('talib'::text)) THEN results.options ELSE NULL::jsonb END) AS talib_options_count,
+    count(DISTINCT CASE WHEN (lower((results.implementation_type)::text) = lower('RustKanda'::text)) THEN results.options ELSE NULL::jsonb END) AS rustkanda_options_count,
+    count(DISTINCT CASE WHEN (lower((results.implementation_type)::text) = lower('RustTa'::text)) THEN results.options ELSE NULL::jsonb END) AS rustta_options_count,
+    round((avg(CASE WHEN (lower((results.implementation_type)::text) = lower('C_tulip'::text)) THEN results.mean_time_ns ELSE NULL::bigint END) / avg(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust'::text)) THEN results.mean_time_ns ELSE NULL::bigint END)), 2) AS c_to_rust_ratio,
+    round((((avg(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust'::text)) THEN results.mean_time_ns ELSE NULL::bigint END) - avg(CASE WHEN (lower((results.implementation_type)::text) = lower('C_tulip'::text)) THEN results.mean_time_ns ELSE NULL::bigint END)) / avg(CASE WHEN (lower((results.implementation_type)::text) = lower('C_tulip'::text)) THEN results.mean_time_ns ELSE NULL::bigint END)) * (100)::numeric), 2) AS rust_vs_c_percent_diff,
+    round((avg(CASE WHEN (lower((results.implementation_type)::text) = lower('talib'::text)) THEN results.mean_time_ns ELSE NULL::bigint END) / avg(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust'::text)) THEN results.mean_time_ns ELSE NULL::bigint END)), 2) AS talib_to_rust_ratio,
+    round((avg(CASE WHEN (lower((results.implementation_type)::text) = lower('RustKanda'::text)) THEN results.mean_time_ns ELSE NULL::bigint END) / avg(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust'::text)) THEN results.mean_time_ns ELSE NULL::bigint END)), 2) AS rustkanda_to_rust_ratio,
+    round((avg(CASE WHEN (lower((results.implementation_type)::text) = lower('RustTa'::text)) THEN results.mean_time_ns ELSE NULL::bigint END) / avg(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust'::text)) THEN results.mean_time_ns ELSE NULL::bigint END)), 2) AS rustta_to_rust_ratio,
+    round((((avg(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust'::text)) THEN results.mean_time_ns ELSE NULL::bigint END) - avg(CASE WHEN (lower((results.implementation_type)::text) = lower('talib'::text)) THEN results.mean_time_ns ELSE NULL::bigint END)) / avg(CASE WHEN (lower((results.implementation_type)::text) = lower('talib'::text)) THEN results.mean_time_ns ELSE NULL::bigint END)) * (100)::numeric), 2) AS rust_vs_talib_percent_diff,
+    round((((avg(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust'::text)) THEN results.mean_time_ns ELSE NULL::bigint END) - avg(CASE WHEN (lower((results.implementation_type)::text) = lower('RustKanda'::text)) THEN results.mean_time_ns ELSE NULL::bigint END)) / avg(CASE WHEN (lower((results.implementation_type)::text) = lower('RustKanda'::text)) THEN results.mean_time_ns ELSE NULL::bigint END)) * (100)::numeric), 2) AS rust_vs_rustkanda_percent_diff,
+    round((((avg(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust'::text)) THEN results.mean_time_ns ELSE NULL::bigint END) - avg(CASE WHEN (lower((results.implementation_type)::text) = lower('RustTa'::text)) THEN results.mean_time_ns ELSE NULL::bigint END)) / avg(CASE WHEN (lower((results.implementation_type)::text) = lower('RustTa'::text)) THEN results.mean_time_ns ELSE NULL::bigint END)) * (100)::numeric), 2) AS rust_vs_rustta_percent_diff
    FROM ((benchmark_runs runs
      JOIN benchmark_results results ON ((runs.id = results.run_id)))
      JOIN indicators ind ON ((results.indicator_id = ind.id)))
   GROUP BY runs.id, runs.run_timestamp, runs.system_info, ind.name
- HAVING (count(DISTINCT CASE WHEN ((results.implementation_type)::text = ANY ((ARRAY['C_tulip'::character varying, 'Rust'::character varying, 'talib'::character varying, 'RustKanda'::character varying, 'RustTa'::character varying])::text[])) THEN results.implementation_type ELSE NULL::character varying END) >= 2)
+ HAVING (count(DISTINCT CASE WHEN (lower((results.implementation_type)::text) = ANY ((ARRAY['c_tulip'::character varying, 'rust'::character varying, 'talib'::character varying, 'rustkanda'::character varying, 'rustta'::character varying])::text[])) THEN results.implementation_type ELSE NULL::character varying END) >= 2)
   ORDER BY runs.run_timestamp DESC, ind.name;
 
 CREATE VIEW candlestick_simplified_comparison AS
 SELECT runs.id AS run_id,
     runs.run_timestamp AS benchmark_date,
-    (runs.system_info ->> 'hostname'::text) AS hostname,
+    lower(runs.system_info ->> 'hostname'::text) AS hostname,
     br.implementation_type AS forecast_name,
     br.input_size,
     br.options,
@@ -115,216 +115,216 @@ SELECT i.name,
 CREATE VIEW performance_comparison AS
 SELECT runs.id AS run_id,
     runs.run_timestamp AS benchmark_date,
-    (runs.system_info ->> 'hostname'::text) AS hostname,
+    lower(runs.system_info ->> 'hostname'::text) AS hostname,
     ind.name AS indicator_name,
     results.stock_symbol,
     results.data_source,
     results.input_size,
     results.options,
-    max(CASE WHEN ((results.implementation_type)::text = 'Rust'::text) THEN results.mean_time_ns ELSE NULL::bigint END) AS rust_mean_time_ns,
-    max(CASE WHEN ((results.implementation_type)::text = 'Rust'::text) THEN results.sample_count ELSE NULL::integer END) AS rust_sample_count,
-    max(CASE WHEN ((results.implementation_type)::text = 'C_tulip'::text) THEN results.mean_time_ns ELSE NULL::bigint END) AS c_mean_time_ns,
-    max(CASE WHEN ((results.implementation_type)::text = 'C_tulip'::text) THEN results.sample_count ELSE NULL::integer END) AS c_sample_count,
-    max(CASE WHEN ((results.implementation_type)::text = 'talib'::text) THEN results.mean_time_ns ELSE NULL::bigint END) AS talib_mean_time_ns,
-    max(CASE WHEN ((results.implementation_type)::text = 'RustKanda'::text) THEN results.mean_time_ns ELSE NULL::bigint END) AS rustkanda_mean_time_ns,
-    max(CASE WHEN ((results.implementation_type)::text = 'RustTa'::text) THEN results.mean_time_ns ELSE NULL::bigint END) AS rustta_mean_time_ns,
-    max(CASE WHEN ((results.implementation_type)::text = 'talib'::text) THEN results.sample_count ELSE NULL::integer END) AS talib_sample_count,
-    max(CASE WHEN ((results.implementation_type)::text = 'RustKanda'::text) THEN results.sample_count ELSE NULL::integer END) AS rustkanda_sample_count,
-    max(CASE WHEN ((results.implementation_type)::text = 'RustTa'::text) THEN results.sample_count ELSE NULL::integer END) AS rustta_sample_count,
-    round(((max(CASE WHEN ((results.implementation_type)::text = 'C_tulip'::text) THEN results.mean_time_ns ELSE NULL::bigint END))::numeric / (max(CASE WHEN ((results.implementation_type)::text = 'Rust'::text) THEN results.mean_time_ns ELSE NULL::bigint END))::numeric), 2) AS c_to_rust_ratio,
-    round(((((max(CASE WHEN ((results.implementation_type)::text = 'Rust'::text) THEN results.mean_time_ns ELSE NULL::bigint END))::numeric - (max(CASE WHEN ((results.implementation_type)::text = 'C_tulip'::text) THEN results.mean_time_ns ELSE NULL::bigint END))::numeric) / (max(CASE WHEN ((results.implementation_type)::text = 'C_tulip'::text) THEN results.mean_time_ns ELSE NULL::bigint END))::numeric) * (100)::numeric), 2) AS rust_vs_c_percent_diff,
-    round(((max(CASE WHEN ((results.implementation_type)::text = 'talib'::text) THEN results.mean_time_ns ELSE NULL::bigint END))::numeric / (max(CASE WHEN ((results.implementation_type)::text = 'Rust'::text) THEN results.mean_time_ns ELSE NULL::bigint END))::numeric), 2) AS talib_to_rust_ratio,
-    round(((max(CASE WHEN ((results.implementation_type)::text = 'RustKanda'::text) THEN results.mean_time_ns ELSE NULL::bigint END))::numeric / (max(CASE WHEN ((results.implementation_type)::text = 'Rust'::text) THEN results.mean_time_ns ELSE NULL::bigint END))::numeric), 2) AS rustkanda_to_rust_ratio,
-    round(((max(CASE WHEN ((results.implementation_type)::text = 'RustTa'::text) THEN results.mean_time_ns ELSE NULL::bigint END))::numeric / (max(CASE WHEN ((results.implementation_type)::text = 'Rust'::text) THEN results.mean_time_ns ELSE NULL::bigint END))::numeric), 2) AS rustta_to_rust_ratio,
-    round(((((max(CASE WHEN ((results.implementation_type)::text = 'Rust'::text) THEN results.mean_time_ns ELSE NULL::bigint END))::numeric - (max(CASE WHEN ((results.implementation_type)::text = 'talib'::text) THEN results.mean_time_ns ELSE NULL::bigint END))::numeric) / (max(CASE WHEN ((results.implementation_type)::text = 'talib'::text) THEN results.mean_time_ns ELSE NULL::bigint END))::numeric) * (100)::numeric), 2) AS rust_vs_talib_percent_diff,
-    round(((((max(CASE WHEN ((results.implementation_type)::text = 'Rust'::text) THEN results.mean_time_ns ELSE NULL::bigint END))::numeric - (max(CASE WHEN ((results.implementation_type)::text = 'RustKanda'::text) THEN results.mean_time_ns ELSE NULL::bigint END))::numeric) / (max(CASE WHEN ((results.implementation_type)::text = 'RustKanda'::text) THEN results.mean_time_ns ELSE NULL::bigint END))::numeric) * (100)::numeric), 2) AS rust_vs_rustkanda_percent_diff,
-    round(((((max(CASE WHEN ((results.implementation_type)::text = 'Rust'::text) THEN results.mean_time_ns ELSE NULL::bigint END))::numeric - (max(CASE WHEN ((results.implementation_type)::text = 'RustTa'::text) THEN results.mean_time_ns ELSE NULL::bigint END))::numeric) / (max(CASE WHEN ((results.implementation_type)::text = 'RustTa'::text) THEN results.mean_time_ns ELSE NULL::bigint END))::numeric) * (100)::numeric), 2) AS rust_vs_rustta_percent_diff
+    max(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust'::text)) THEN results.mean_time_ns ELSE NULL::bigint END) AS rust_mean_time_ns,
+    max(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust'::text)) THEN results.sample_count ELSE NULL::integer END) AS rust_sample_count,
+    max(CASE WHEN (lower((results.implementation_type)::text) = lower('C_tulip'::text)) THEN results.mean_time_ns ELSE NULL::bigint END) AS c_mean_time_ns,
+    max(CASE WHEN (lower((results.implementation_type)::text) = lower('C_tulip'::text)) THEN results.sample_count ELSE NULL::integer END) AS c_sample_count,
+    max(CASE WHEN (lower((results.implementation_type)::text) = lower('talib'::text)) THEN results.mean_time_ns ELSE NULL::bigint END) AS talib_mean_time_ns,
+    max(CASE WHEN (lower((results.implementation_type)::text) = lower('RustKanda'::text)) THEN results.mean_time_ns ELSE NULL::bigint END) AS rustkanda_mean_time_ns,
+    max(CASE WHEN (lower((results.implementation_type)::text) = lower('RustTa'::text)) THEN results.mean_time_ns ELSE NULL::bigint END) AS rustta_mean_time_ns,
+    max(CASE WHEN (lower((results.implementation_type)::text) = lower('talib'::text)) THEN results.sample_count ELSE NULL::integer END) AS talib_sample_count,
+    max(CASE WHEN (lower((results.implementation_type)::text) = lower('RustKanda'::text)) THEN results.sample_count ELSE NULL::integer END) AS rustkanda_sample_count,
+    max(CASE WHEN (lower((results.implementation_type)::text) = lower('RustTa'::text)) THEN results.sample_count ELSE NULL::integer END) AS rustta_sample_count,
+    round(((max(CASE WHEN (lower((results.implementation_type)::text) = lower('C_tulip'::text)) THEN results.mean_time_ns ELSE NULL::bigint END))::numeric / (max(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust'::text)) THEN results.mean_time_ns ELSE NULL::bigint END))::numeric), 2) AS c_to_rust_ratio,
+    round(((((max(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust'::text)) THEN results.mean_time_ns ELSE NULL::bigint END))::numeric - (max(CASE WHEN (lower((results.implementation_type)::text) = lower('C_tulip'::text)) THEN results.mean_time_ns ELSE NULL::bigint END))::numeric) / (max(CASE WHEN (lower((results.implementation_type)::text) = lower('C_tulip'::text)) THEN results.mean_time_ns ELSE NULL::bigint END))::numeric) * (100)::numeric), 2) AS rust_vs_c_percent_diff,
+    round(((max(CASE WHEN (lower((results.implementation_type)::text) = lower('talib'::text)) THEN results.mean_time_ns ELSE NULL::bigint END))::numeric / (max(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust'::text)) THEN results.mean_time_ns ELSE NULL::bigint END))::numeric), 2) AS talib_to_rust_ratio,
+    round(((max(CASE WHEN (lower((results.implementation_type)::text) = lower('RustKanda'::text)) THEN results.mean_time_ns ELSE NULL::bigint END))::numeric / (max(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust'::text)) THEN results.mean_time_ns ELSE NULL::bigint END))::numeric), 2) AS rustkanda_to_rust_ratio,
+    round(((max(CASE WHEN (lower((results.implementation_type)::text) = lower('RustTa'::text)) THEN results.mean_time_ns ELSE NULL::bigint END))::numeric / (max(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust'::text)) THEN results.mean_time_ns ELSE NULL::bigint END))::numeric), 2) AS rustta_to_rust_ratio,
+    round(((((max(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust'::text)) THEN results.mean_time_ns ELSE NULL::bigint END))::numeric - (max(CASE WHEN (lower((results.implementation_type)::text) = lower('talib'::text)) THEN results.mean_time_ns ELSE NULL::bigint END))::numeric) / (max(CASE WHEN (lower((results.implementation_type)::text) = lower('talib'::text)) THEN results.mean_time_ns ELSE NULL::bigint END))::numeric) * (100)::numeric), 2) AS rust_vs_talib_percent_diff,
+    round(((((max(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust'::text)) THEN results.mean_time_ns ELSE NULL::bigint END))::numeric - (max(CASE WHEN (lower((results.implementation_type)::text) = lower('RustKanda'::text)) THEN results.mean_time_ns ELSE NULL::bigint END))::numeric) / (max(CASE WHEN (lower((results.implementation_type)::text) = lower('RustKanda'::text)) THEN results.mean_time_ns ELSE NULL::bigint END))::numeric) * (100)::numeric), 2) AS rust_vs_rustkanda_percent_diff,
+    round(((((max(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust'::text)) THEN results.mean_time_ns ELSE NULL::bigint END))::numeric - (max(CASE WHEN (lower((results.implementation_type)::text) = lower('RustTa'::text)) THEN results.mean_time_ns ELSE NULL::bigint END))::numeric) / (max(CASE WHEN (lower((results.implementation_type)::text) = lower('RustTa'::text)) THEN results.mean_time_ns ELSE NULL::bigint END))::numeric) * (100)::numeric), 2) AS rust_vs_rustta_percent_diff
    FROM ((benchmark_runs runs
      JOIN benchmark_results results ON ((runs.id = results.run_id)))
      JOIN indicators ind ON ((results.indicator_id = ind.id)))
   GROUP BY runs.id, runs.run_timestamp, runs.system_info, ind.name, results.stock_symbol, results.data_source, results.input_size, results.options
- HAVING (count(DISTINCT CASE WHEN ((results.implementation_type)::text = ANY ((ARRAY['C_tulip'::character varying, 'Rust'::character varying, 'talib'::character varying, 'RustKanda'::character varying, 'RustTa'::character varying])::text[])) THEN results.implementation_type ELSE NULL::character varying END) >= 2)
+ HAVING (count(DISTINCT CASE WHEN (lower((results.implementation_type)::text) = ANY ((ARRAY['c_tulip'::character varying, 'rust'::character varying, 'talib'::character varying, 'rustkanda'::character varying, 'rustta'::character varying])::text[])) THEN results.implementation_type ELSE NULL::character varying END) >= 2)
   ORDER BY runs.run_timestamp DESC, ind.name, results.stock_symbol;
 
 CREATE VIEW simplified_comparison AS
 SELECT runs.id AS run_id,
     runs.run_timestamp AS benchmark_date,
-    (runs.system_info ->> 'hostname'::text) AS hostname,
+    lower(runs.system_info ->> 'hostname'::text) AS hostname,
     ind.name AS indicator_name,
     results.input_size,
     results.options,
-    round(avg(CASE WHEN ((results.implementation_type)::text = 'Rust'::text) THEN results.mean_time_ns ELSE NULL::bigint END)) AS rust_avg_mean_time_ns,
-    count(CASE WHEN ((results.implementation_type)::text = 'Rust'::text) THEN 1 ELSE NULL::integer END) AS rust_symbol_count,
-    round(avg(CASE WHEN ((results.implementation_type)::text = 'C_tulip'::text) THEN results.mean_time_ns ELSE NULL::bigint END)) AS c_avg_mean_time_ns,
-    count(CASE WHEN ((results.implementation_type)::text = 'C_tulip'::text) THEN 1 ELSE NULL::integer END) AS c_symbol_count,
-    round(avg(CASE WHEN ((results.implementation_type)::text = 'talib'::text) THEN results.mean_time_ns ELSE NULL::bigint END)) AS talib_avg_mean_time_ns,
-    round(avg(CASE WHEN ((results.implementation_type)::text = 'RustKanda'::text) THEN results.mean_time_ns ELSE NULL::bigint END)) AS rustkanda_avg_mean_time_ns,
-    round(avg(CASE WHEN ((results.implementation_type)::text = 'RustTa'::text) THEN results.mean_time_ns ELSE NULL::bigint END)) AS rustta_avg_mean_time_ns,
-    count(CASE WHEN ((results.implementation_type)::text = 'talib'::text) THEN 1 ELSE NULL::integer END) AS talib_symbol_count,
-    count(CASE WHEN ((results.implementation_type)::text = 'RustKanda'::text) THEN 1 ELSE NULL::integer END) AS rustkanda_symbol_count,
-    count(CASE WHEN ((results.implementation_type)::text = 'RustTa'::text) THEN 1 ELSE NULL::integer END) AS rustta_symbol_count,
-    round((avg(CASE WHEN ((results.implementation_type)::text = 'C_tulip'::text) THEN results.mean_time_ns ELSE NULL::bigint END) / avg(CASE WHEN ((results.implementation_type)::text = 'Rust'::text) THEN results.mean_time_ns ELSE NULL::bigint END)), 2) AS c_to_rust_ratio,
-    round((((avg(CASE WHEN ((results.implementation_type)::text = 'Rust'::text) THEN results.mean_time_ns ELSE NULL::bigint END) - avg(CASE WHEN ((results.implementation_type)::text = 'C_tulip'::text) THEN results.mean_time_ns ELSE NULL::bigint END)) / avg(CASE WHEN ((results.implementation_type)::text = 'C_tulip'::text) THEN results.mean_time_ns ELSE NULL::bigint END)) * (100)::numeric), 2) AS rust_vs_c_percent_diff,
-    round((avg(CASE WHEN ((results.implementation_type)::text = 'talib'::text) THEN results.mean_time_ns ELSE NULL::bigint END) / avg(CASE WHEN ((results.implementation_type)::text = 'Rust'::text) THEN results.mean_time_ns ELSE NULL::bigint END)), 2) AS talib_to_rust_ratio,
-    round((avg(CASE WHEN ((results.implementation_type)::text = 'RustKanda'::text) THEN results.mean_time_ns ELSE NULL::bigint END) / avg(CASE WHEN ((results.implementation_type)::text = 'Rust'::text) THEN results.mean_time_ns ELSE NULL::bigint END)), 2) AS rustkanda_to_rust_ratio,
-    round((avg(CASE WHEN ((results.implementation_type)::text = 'RustTa'::text) THEN results.mean_time_ns ELSE NULL::bigint END) / avg(CASE WHEN ((results.implementation_type)::text = 'Rust'::text) THEN results.mean_time_ns ELSE NULL::bigint END)), 2) AS rustta_to_rust_ratio,
-    round((((avg(CASE WHEN ((results.implementation_type)::text = 'Rust'::text) THEN results.mean_time_ns ELSE NULL::bigint END) - avg(CASE WHEN ((results.implementation_type)::text = 'talib'::text) THEN results.mean_time_ns ELSE NULL::bigint END)) / avg(CASE WHEN ((results.implementation_type)::text = 'talib'::text) THEN results.mean_time_ns ELSE NULL::bigint END)) * (100)::numeric), 2) AS rust_vs_talib_percent_diff,
-    round((((avg(CASE WHEN ((results.implementation_type)::text = 'Rust'::text) THEN results.mean_time_ns ELSE NULL::bigint END) - avg(CASE WHEN ((results.implementation_type)::text = 'RustKanda'::text) THEN results.mean_time_ns ELSE NULL::bigint END)) / avg(CASE WHEN ((results.implementation_type)::text = 'RustKanda'::text) THEN results.mean_time_ns ELSE NULL::bigint END)) * (100)::numeric), 2) AS rust_vs_rustkanda_percent_diff,
-    round((((avg(CASE WHEN ((results.implementation_type)::text = 'Rust'::text) THEN results.mean_time_ns ELSE NULL::bigint END) - avg(CASE WHEN ((results.implementation_type)::text = 'RustTa'::text) THEN results.mean_time_ns ELSE NULL::bigint END)) / avg(CASE WHEN ((results.implementation_type)::text = 'RustTa'::text) THEN results.mean_time_ns ELSE NULL::bigint END)) * (100)::numeric), 2) AS rust_vs_rustta_percent_diff
+    round(avg(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust'::text)) THEN results.mean_time_ns ELSE NULL::bigint END)) AS rust_avg_mean_time_ns,
+    count(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust'::text)) THEN 1 ELSE NULL::integer END) AS rust_symbol_count,
+    round(avg(CASE WHEN (lower((results.implementation_type)::text) = lower('C_tulip'::text)) THEN results.mean_time_ns ELSE NULL::bigint END)) AS c_avg_mean_time_ns,
+    count(CASE WHEN (lower((results.implementation_type)::text) = lower('C_tulip'::text)) THEN 1 ELSE NULL::integer END) AS c_symbol_count,
+    round(avg(CASE WHEN (lower((results.implementation_type)::text) = lower('talib'::text)) THEN results.mean_time_ns ELSE NULL::bigint END)) AS talib_avg_mean_time_ns,
+    round(avg(CASE WHEN (lower((results.implementation_type)::text) = lower('RustKanda'::text)) THEN results.mean_time_ns ELSE NULL::bigint END)) AS rustkanda_avg_mean_time_ns,
+    round(avg(CASE WHEN (lower((results.implementation_type)::text) = lower('RustTa'::text)) THEN results.mean_time_ns ELSE NULL::bigint END)) AS rustta_avg_mean_time_ns,
+    count(CASE WHEN (lower((results.implementation_type)::text) = lower('talib'::text)) THEN 1 ELSE NULL::integer END) AS talib_symbol_count,
+    count(CASE WHEN (lower((results.implementation_type)::text) = lower('RustKanda'::text)) THEN 1 ELSE NULL::integer END) AS rustkanda_symbol_count,
+    count(CASE WHEN (lower((results.implementation_type)::text) = lower('RustTa'::text)) THEN 1 ELSE NULL::integer END) AS rustta_symbol_count,
+    round((avg(CASE WHEN (lower((results.implementation_type)::text) = lower('C_tulip'::text)) THEN results.mean_time_ns ELSE NULL::bigint END) / avg(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust'::text)) THEN results.mean_time_ns ELSE NULL::bigint END)), 2) AS c_to_rust_ratio,
+    round((((avg(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust'::text)) THEN results.mean_time_ns ELSE NULL::bigint END) - avg(CASE WHEN (lower((results.implementation_type)::text) = lower('C_tulip'::text)) THEN results.mean_time_ns ELSE NULL::bigint END)) / avg(CASE WHEN (lower((results.implementation_type)::text) = lower('C_tulip'::text)) THEN results.mean_time_ns ELSE NULL::bigint END)) * (100)::numeric), 2) AS rust_vs_c_percent_diff,
+    round((avg(CASE WHEN (lower((results.implementation_type)::text) = lower('talib'::text)) THEN results.mean_time_ns ELSE NULL::bigint END) / avg(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust'::text)) THEN results.mean_time_ns ELSE NULL::bigint END)), 2) AS talib_to_rust_ratio,
+    round((avg(CASE WHEN (lower((results.implementation_type)::text) = lower('RustKanda'::text)) THEN results.mean_time_ns ELSE NULL::bigint END) / avg(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust'::text)) THEN results.mean_time_ns ELSE NULL::bigint END)), 2) AS rustkanda_to_rust_ratio,
+    round((avg(CASE WHEN (lower((results.implementation_type)::text) = lower('RustTa'::text)) THEN results.mean_time_ns ELSE NULL::bigint END) / avg(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust'::text)) THEN results.mean_time_ns ELSE NULL::bigint END)), 2) AS rustta_to_rust_ratio,
+    round((((avg(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust'::text)) THEN results.mean_time_ns ELSE NULL::bigint END) - avg(CASE WHEN (lower((results.implementation_type)::text) = lower('talib'::text)) THEN results.mean_time_ns ELSE NULL::bigint END)) / avg(CASE WHEN (lower((results.implementation_type)::text) = lower('talib'::text)) THEN results.mean_time_ns ELSE NULL::bigint END)) * (100)::numeric), 2) AS rust_vs_talib_percent_diff,
+    round((((avg(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust'::text)) THEN results.mean_time_ns ELSE NULL::bigint END) - avg(CASE WHEN (lower((results.implementation_type)::text) = lower('RustKanda'::text)) THEN results.mean_time_ns ELSE NULL::bigint END)) / avg(CASE WHEN (lower((results.implementation_type)::text) = lower('RustKanda'::text)) THEN results.mean_time_ns ELSE NULL::bigint END)) * (100)::numeric), 2) AS rust_vs_rustkanda_percent_diff,
+    round((((avg(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust'::text)) THEN results.mean_time_ns ELSE NULL::bigint END) - avg(CASE WHEN (lower((results.implementation_type)::text) = lower('RustTa'::text)) THEN results.mean_time_ns ELSE NULL::bigint END)) / avg(CASE WHEN (lower((results.implementation_type)::text) = lower('RustTa'::text)) THEN results.mean_time_ns ELSE NULL::bigint END)) * (100)::numeric), 2) AS rust_vs_rustta_percent_diff
    FROM ((benchmark_runs runs
      JOIN benchmark_results results ON ((runs.id = results.run_id)))
      JOIN indicators ind ON ((results.indicator_id = ind.id)))
   GROUP BY runs.id, runs.run_timestamp, runs.system_info, ind.name, results.input_size, results.options
- HAVING (count(DISTINCT CASE WHEN ((results.implementation_type)::text = ANY ((ARRAY['C_tulip'::character varying, 'Rust'::character varying, 'talib'::character varying, 'RustKanda'::character varying, 'RustTa'::character varying])::text[])) THEN results.implementation_type ELSE NULL::character varying END) >= 2)
+ HAVING (count(DISTINCT CASE WHEN (lower((results.implementation_type)::text) = ANY ((ARRAY['c_tulip'::character varying, 'rust'::character varying, 'talib'::character varying, 'rustkanda'::character varying, 'rustta'::character varying])::text[])) THEN results.implementation_type ELSE NULL::character varying END) >= 2)
   ORDER BY runs.run_timestamp DESC, ind.name;
 
 CREATE VIEW rust_impl_avg_options_comparison AS
 SELECT runs.id AS run_id,
     runs.run_timestamp AS benchmark_date,
-    (runs.system_info ->> 'hostname'::text) AS hostname,
+    lower(runs.system_info ->> 'hostname'::text) AS hostname,
     ind.name AS indicator_name,
-    round(avg(CASE WHEN ((results.implementation_type)::text = 'Rust'::text) THEN results.mean_time_ns ELSE NULL::bigint END)) AS rust_avg_mean_time_ns,
-    round(avg(CASE WHEN ((results.implementation_type)::text = 'Rust_FromState'::text) THEN results.mean_time_ns ELSE NULL::bigint END)) AS rust_fromstate_avg_mean_time_ns,
-    round(avg(CASE WHEN ((results.implementation_type)::text = 'Rust_optional'::text) THEN results.mean_time_ns ELSE NULL::bigint END)) AS rust_optional_avg_mean_time_ns,
-    round(avg(CASE WHEN ((results.implementation_type)::text = 'Rust_FromState_1_Bar'::text) THEN results.mean_time_ns ELSE NULL::bigint END)) AS rust_fromstate_1_bar_avg_mean_time_ns,
-  round(avg(CASE WHEN ((results.implementation_type)::text = 'Rust_FromState_1_Bar_json'::text) THEN results.mean_time_ns ELSE NULL::bigint END)) AS rust_fromstate_1_bar_json_avg_mean_time_ns,
-  round(avg(CASE WHEN ((results.implementation_type)::text = 'RustKanda'::text) THEN results.mean_time_ns ELSE NULL::bigint END)) AS rust_kanda_avg_mean_time_ns,
-  round(avg(CASE WHEN ((results.implementation_type)::text = 'RustTa'::text) THEN results.mean_time_ns ELSE NULL::bigint END)) AS rust_ta_avg_mean_time_ns
+    round(avg(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust'::text)) THEN results.mean_time_ns ELSE NULL::bigint END)) AS rust_avg_mean_time_ns,
+    round(avg(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust_FromState'::text)) THEN results.mean_time_ns ELSE NULL::bigint END)) AS rust_fromstate_avg_mean_time_ns,
+    round(avg(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust_optional'::text)) THEN results.mean_time_ns ELSE NULL::bigint END)) AS rust_optional_avg_mean_time_ns,
+    round(avg(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust_FromState_1_Bar'::text)) THEN results.mean_time_ns ELSE NULL::bigint END)) AS rust_fromstate_1_bar_avg_mean_time_ns,
+  round(avg(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust_FromState_1_Bar_json'::text)) THEN results.mean_time_ns ELSE NULL::bigint END)) AS rust_fromstate_1_bar_json_avg_mean_time_ns,
+  round(avg(CASE WHEN (lower((results.implementation_type)::text) = lower('RustKanda'::text)) THEN results.mean_time_ns ELSE NULL::bigint END)) AS rust_kanda_avg_mean_time_ns,
+  round(avg(CASE WHEN (lower((results.implementation_type)::text) = lower('RustTa'::text)) THEN results.mean_time_ns ELSE NULL::bigint END)) AS rust_ta_avg_mean_time_ns
    FROM ((benchmark_runs runs
      JOIN benchmark_results results ON ((runs.id = results.run_id)))
      JOIN indicators ind ON ((results.indicator_id = ind.id)))
   WHERE ((ind.category)::text <> 'candlestick'::text)
   GROUP BY runs.id, runs.run_timestamp, runs.system_info, ind.name
- HAVING (count(DISTINCT CASE WHEN ((results.implementation_type)::text = ANY ((ARRAY['Rust'::character varying, 'Rust_FromState'::character varying, 'Rust_optional'::character varying, 'Rust_FromState_1_Bar'::character varying, 'Rust_FromState_1_Bar_json'::character varying, 'RustKanda'::character varying, 'RustTa'::character varying])::text[])) THEN results.implementation_type ELSE NULL::character varying END) >= 1)
+ HAVING (count(DISTINCT CASE WHEN (lower((results.implementation_type)::text) = ANY ((ARRAY['rust'::character varying, 'rust_fromstate'::character varying, 'rust_optional'::character varying, 'rust_fromstate_1_bar'::character varying, 'rust_fromstate_1_bar_json'::character varying, 'rustkanda'::character varying, 'rustta'::character varying])::text[])) THEN results.implementation_type ELSE NULL::character varying END) >= 1)
   ORDER BY runs.run_timestamp DESC, ind.name;
 
 CREATE VIEW rust_impl_performance_comparison AS
 SELECT runs.id AS run_id,
     runs.run_timestamp AS benchmark_date,
-    (runs.system_info ->> 'hostname'::text) AS hostname,
+    lower(runs.system_info ->> 'hostname'::text) AS hostname,
     ind.name AS indicator_name,
     results.stock_symbol,
     results.data_source,
     results.input_size,
     results.options,
-    max(CASE WHEN ((results.implementation_type)::text = 'Rust'::text) THEN results.mean_time_ns ELSE NULL::bigint END) AS rust_mean_time_ns,
-    max(CASE WHEN ((results.implementation_type)::text = 'Rust'::text) THEN results.sample_count ELSE NULL::integer END) AS rust_sample_count,
-    max(CASE WHEN ((results.implementation_type)::text = 'Rust_FromState'::text) THEN results.mean_time_ns ELSE NULL::bigint END) AS rust_fromstate_mean_time_ns,
-    max(CASE WHEN ((results.implementation_type)::text = 'Rust_FromState'::text) THEN results.sample_count ELSE NULL::integer END) AS rust_fromstate_sample_count,
-    max(CASE WHEN ((results.implementation_type)::text = 'Rust_optional'::text) THEN results.mean_time_ns ELSE NULL::bigint END) AS rust_optional_mean_time_ns,
-    max(CASE WHEN ((results.implementation_type)::text = 'Rust_optional'::text) THEN results.sample_count ELSE NULL::integer END) AS rust_optional_sample_count,
-    max(CASE WHEN ((results.implementation_type)::text = 'Rust_FromState_1_Bar'::text) THEN results.mean_time_ns ELSE NULL::bigint END) AS rust_fromstate_1_bar_mean_time_ns,
-    max(CASE WHEN ((results.implementation_type)::text = 'Rust_FromState_1_Bar'::text) THEN results.sample_count ELSE NULL::integer END) AS rust_fromstate_1_bar_sample_count,
-    max(CASE WHEN ((results.implementation_type)::text = 'Rust_FromState_1_Bar_json'::text) THEN results.mean_time_ns ELSE NULL::bigint END) AS rust_fromstate_1_bar_json_mean_time_ns,
-    max(CASE WHEN ((results.implementation_type)::text = 'Rust_FromState_1_Bar_json'::text) THEN results.sample_count ELSE NULL::integer END) AS rust_fromstate_1_bar_json_sample_count,
-    max(CASE WHEN ((results.implementation_type)::text = 'RustKanda'::text) THEN results.mean_time_ns ELSE NULL::bigint END) AS rust_kanda_mean_time_ns,
-    max(CASE WHEN ((results.implementation_type)::text = 'RustKanda'::text) THEN results.sample_count ELSE NULL::integer END) AS rust_kanda_sample_count,
-    max(CASE WHEN ((results.implementation_type)::text = 'RustTa'::text) THEN results.mean_time_ns ELSE NULL::bigint END) AS rust_ta_mean_time_ns,
-    max(CASE WHEN ((results.implementation_type)::text = 'RustTa'::text) THEN results.sample_count ELSE NULL::integer END) AS rust_ta_sample_count
+    max(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust'::text)) THEN results.mean_time_ns ELSE NULL::bigint END) AS rust_mean_time_ns,
+    max(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust'::text)) THEN results.sample_count ELSE NULL::integer END) AS rust_sample_count,
+    max(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust_FromState'::text)) THEN results.mean_time_ns ELSE NULL::bigint END) AS rust_fromstate_mean_time_ns,
+    max(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust_FromState'::text)) THEN results.sample_count ELSE NULL::integer END) AS rust_fromstate_sample_count,
+    max(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust_optional'::text)) THEN results.mean_time_ns ELSE NULL::bigint END) AS rust_optional_mean_time_ns,
+    max(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust_optional'::text)) THEN results.sample_count ELSE NULL::integer END) AS rust_optional_sample_count,
+    max(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust_FromState_1_Bar'::text)) THEN results.mean_time_ns ELSE NULL::bigint END) AS rust_fromstate_1_bar_mean_time_ns,
+    max(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust_FromState_1_Bar'::text)) THEN results.sample_count ELSE NULL::integer END) AS rust_fromstate_1_bar_sample_count,
+    max(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust_FromState_1_Bar_json'::text)) THEN results.mean_time_ns ELSE NULL::bigint END) AS rust_fromstate_1_bar_json_mean_time_ns,
+    max(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust_FromState_1_Bar_json'::text)) THEN results.sample_count ELSE NULL::integer END) AS rust_fromstate_1_bar_json_sample_count,
+    max(CASE WHEN (lower((results.implementation_type)::text) = lower('RustKanda'::text)) THEN results.mean_time_ns ELSE NULL::bigint END) AS rust_kanda_mean_time_ns,
+    max(CASE WHEN (lower((results.implementation_type)::text) = lower('RustKanda'::text)) THEN results.sample_count ELSE NULL::integer END) AS rust_kanda_sample_count,
+    max(CASE WHEN (lower((results.implementation_type)::text) = lower('RustTa'::text)) THEN results.mean_time_ns ELSE NULL::bigint END) AS rust_ta_mean_time_ns,
+    max(CASE WHEN (lower((results.implementation_type)::text) = lower('RustTa'::text)) THEN results.sample_count ELSE NULL::integer END) AS rust_ta_sample_count
    FROM ((benchmark_runs runs
      JOIN benchmark_results results ON ((runs.id = results.run_id)))
      JOIN indicators ind ON ((results.indicator_id = ind.id)))
   WHERE ((ind.category)::text <> 'candlestick'::text)
   GROUP BY runs.id, runs.run_timestamp, runs.system_info, ind.name, results.stock_symbol, results.data_source, results.input_size, results.options
- HAVING (count(DISTINCT CASE WHEN ((results.implementation_type)::text = ANY ((ARRAY['Rust'::character varying, 'Rust_FromState'::character varying, 'Rust_optional'::character varying, 'Rust_FromState_1_Bar'::character varying, 'Rust_FromState_1_Bar_json'::character varying, 'RustKanda'::character varying, 'RustTa'::character varying])::text[])) THEN results.implementation_type ELSE NULL::character varying END) >= 1)
+ HAVING (count(DISTINCT CASE WHEN (lower((results.implementation_type)::text) = ANY ((ARRAY['rust'::character varying, 'rust_fromstate'::character varying, 'rust_optional'::character varying, 'rust_fromstate_1_bar'::character varying, 'rust_fromstate_1_bar_json'::character varying, 'rustkanda'::character varying, 'rustta'::character varying])::text[])) THEN results.implementation_type ELSE NULL::character varying END) >= 1)
   ORDER BY runs.run_timestamp DESC, ind.name, results.stock_symbol;
 
 CREATE VIEW rust_impl_simplified_comparison AS
 SELECT runs.id AS run_id,
     runs.run_timestamp AS benchmark_date,
-    (runs.system_info ->> 'hostname'::text) AS hostname,
+    lower(runs.system_info ->> 'hostname'::text) AS hostname,
     ind.name AS indicator_name,
     results.input_size,
     results.options,
-    round(avg(CASE WHEN ((results.implementation_type)::text = 'Rust'::text) THEN results.mean_time_ns ELSE NULL::bigint END)) AS rust_avg_mean_time_ns,
-    count(CASE WHEN ((results.implementation_type)::text = 'Rust'::text) THEN 1 ELSE NULL::integer END) AS rust_symbol_count,
-    round(avg(CASE WHEN ((results.implementation_type)::text = 'Rust_FromState'::text) THEN results.mean_time_ns ELSE NULL::bigint END)) AS rust_fromstate_avg_mean_time_ns,
-    count(CASE WHEN ((results.implementation_type)::text = 'Rust_FromState'::text) THEN 1 ELSE NULL::integer END) AS rust_fromstate_symbol_count,
-    round(avg(CASE WHEN ((results.implementation_type)::text = 'Rust_optional'::text) THEN results.mean_time_ns ELSE NULL::bigint END)) AS rust_optional_avg_mean_time_ns,
-    count(CASE WHEN ((results.implementation_type)::text = 'Rust_optional'::text) THEN 1 ELSE NULL::integer END) AS rust_optional_symbol_count,
-    round(avg(CASE WHEN ((results.implementation_type)::text = 'Rust_FromState_1_Bar'::text) THEN results.mean_time_ns ELSE NULL::bigint END)) AS rust_fromstate_1_bar_avg_mean_time_ns,
-    count(CASE WHEN ((results.implementation_type)::text = 'Rust_FromState_1_Bar'::text) THEN 1 ELSE NULL::integer END) AS rust_fromstate_1_bar_symbol_count,
-    round(avg(CASE WHEN ((results.implementation_type)::text = 'Rust_FromState_1_Bar_json'::text) THEN results.mean_time_ns ELSE NULL::bigint END)) AS rust_fromstate_1_bar_json_avg_mean_time_ns,
-    count(CASE WHEN ((results.implementation_type)::text = 'Rust_FromState_1_Bar_json'::text) THEN 1 ELSE NULL::integer END) AS rust_fromstate_1_bar_json_symbol_count,
-    round(avg(CASE WHEN ((results.implementation_type)::text = 'RustKanda'::text) THEN results.mean_time_ns ELSE NULL::bigint END)) AS rust_kanda_avg_mean_time_ns,
-    count(CASE WHEN ((results.implementation_type)::text = 'RustKanda'::text) THEN 1 ELSE NULL::integer END) AS rust_kanda_symbol_count,
-    round(avg(CASE WHEN ((results.implementation_type)::text = 'RustTa'::text) THEN results.mean_time_ns ELSE NULL::bigint END)) AS rust_ta_avg_mean_time_ns,
-    count(CASE WHEN ((results.implementation_type)::text = 'RustTa'::text) THEN 1 ELSE NULL::integer END) AS rust_ta_symbol_count
+    round(avg(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust'::text)) THEN results.mean_time_ns ELSE NULL::bigint END)) AS rust_avg_mean_time_ns,
+    count(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust'::text)) THEN 1 ELSE NULL::integer END) AS rust_symbol_count,
+    round(avg(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust_FromState'::text)) THEN results.mean_time_ns ELSE NULL::bigint END)) AS rust_fromstate_avg_mean_time_ns,
+    count(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust_FromState'::text)) THEN 1 ELSE NULL::integer END) AS rust_fromstate_symbol_count,
+    round(avg(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust_optional'::text)) THEN results.mean_time_ns ELSE NULL::bigint END)) AS rust_optional_avg_mean_time_ns,
+    count(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust_optional'::text)) THEN 1 ELSE NULL::integer END) AS rust_optional_symbol_count,
+    round(avg(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust_FromState_1_Bar'::text)) THEN results.mean_time_ns ELSE NULL::bigint END)) AS rust_fromstate_1_bar_avg_mean_time_ns,
+    count(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust_FromState_1_Bar'::text)) THEN 1 ELSE NULL::integer END) AS rust_fromstate_1_bar_symbol_count,
+    round(avg(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust_FromState_1_Bar_json'::text)) THEN results.mean_time_ns ELSE NULL::bigint END)) AS rust_fromstate_1_bar_json_avg_mean_time_ns,
+    count(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust_FromState_1_Bar_json'::text)) THEN 1 ELSE NULL::integer END) AS rust_fromstate_1_bar_json_symbol_count,
+    round(avg(CASE WHEN (lower((results.implementation_type)::text) = lower('RustKanda'::text)) THEN results.mean_time_ns ELSE NULL::bigint END)) AS rust_kanda_avg_mean_time_ns,
+    count(CASE WHEN (lower((results.implementation_type)::text) = lower('RustKanda'::text)) THEN 1 ELSE NULL::integer END) AS rust_kanda_symbol_count,
+    round(avg(CASE WHEN (lower((results.implementation_type)::text) = lower('RustTa'::text)) THEN results.mean_time_ns ELSE NULL::bigint END)) AS rust_ta_avg_mean_time_ns,
+    count(CASE WHEN (lower((results.implementation_type)::text) = lower('RustTa'::text)) THEN 1 ELSE NULL::integer END) AS rust_ta_symbol_count
    FROM ((benchmark_runs runs
      JOIN benchmark_results results ON ((runs.id = results.run_id)))
      JOIN indicators ind ON ((results.indicator_id = ind.id)))
   WHERE ((ind.category)::text <> 'candlestick'::text)
   GROUP BY runs.id, runs.run_timestamp, runs.system_info, ind.name, results.input_size, results.options
- HAVING (count(DISTINCT CASE WHEN ((results.implementation_type)::text = ANY ((ARRAY['Rust'::character varying, 'Rust_FromState'::character varying, 'Rust_optional'::character varying, 'Rust_FromState_1_Bar'::character varying, 'Rust_FromState_1_Bar_json'::character varying, 'RustKanda'::character varying, 'RustTa'::character varying])::text[])) THEN results.implementation_type ELSE NULL::character varying END) >= 1)
+ HAVING (count(DISTINCT CASE WHEN (lower((results.implementation_type)::text) = ANY ((ARRAY['rust'::character varying, 'rust_fromstate'::character varying, 'rust_optional'::character varying, 'rust_fromstate_1_bar'::character varying, 'rust_fromstate_1_bar_json'::character varying, 'rustkanda'::character varying, 'rustta'::character varying])::text[])) THEN results.implementation_type ELSE NULL::character varying END) >= 1)
   ORDER BY runs.run_timestamp DESC, ind.name;
 
 CREATE VIEW rust_simd_performance_comparison AS
 SELECT runs.id AS run_id,
     runs.run_timestamp AS benchmark_date,
-    (runs.system_info ->> 'hostname'::text) AS hostname,
+    lower(runs.system_info ->> 'hostname'::text) AS hostname,
     ind.name AS indicator_name,
     results.stock_symbol,
     results.data_source,
     results.input_size,
-    sum(CASE WHEN ((results.implementation_type)::text = 'Rust'::text) THEN results.mean_time_ns ELSE NULL::bigint END) AS rust_total_mean_time_ns,
-    count(CASE WHEN ((results.implementation_type)::text = 'Rust'::text) THEN 1 ELSE NULL::integer END) AS rust_options_count,
-    max(CASE WHEN ((results.implementation_type)::text = 'Rust_SIMD'::text) THEN results.mean_time_ns ELSE NULL::bigint END) AS rust_simd_mean_time_ns,
-    max(CASE WHEN ((results.implementation_type)::text = 'Rust_SIMD'::text) THEN results.sample_count ELSE NULL::integer END) AS rust_simd_sample_count,
-    round(((max(CASE WHEN ((results.implementation_type)::text = 'Rust_SIMD'::text) THEN results.mean_time_ns ELSE NULL::bigint END))::numeric / sum(CASE WHEN ((results.implementation_type)::text = 'Rust'::text) THEN results.mean_time_ns ELSE NULL::bigint END)), 4) AS simd_to_rust_ratio,
-    round(((sum(CASE WHEN ((results.implementation_type)::text = 'Rust'::text) THEN results.mean_time_ns ELSE NULL::bigint END) / (max(CASE WHEN ((results.implementation_type)::text = 'Rust_SIMD'::text) THEN results.mean_time_ns ELSE NULL::bigint END))::numeric) * (100)::numeric), 2) AS simd_vs_rust_percent_improvement,
-    round((sum(CASE WHEN ((results.implementation_type)::text = 'Rust'::text) THEN results.mean_time_ns ELSE NULL::bigint END) / (max(CASE WHEN ((results.implementation_type)::text = 'Rust_SIMD'::text) THEN results.mean_time_ns ELSE NULL::bigint END))::numeric), 2) AS simd_speedup_factor
+    sum(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust'::text)) THEN results.mean_time_ns ELSE NULL::bigint END) AS rust_total_mean_time_ns,
+    count(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust'::text)) THEN 1 ELSE NULL::integer END) AS rust_options_count,
+    max(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust_SIMD'::text)) THEN results.mean_time_ns ELSE NULL::bigint END) AS rust_simd_mean_time_ns,
+    max(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust_SIMD'::text)) THEN results.sample_count ELSE NULL::integer END) AS rust_simd_sample_count,
+    round(((max(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust_SIMD'::text)) THEN results.mean_time_ns ELSE NULL::bigint END))::numeric / sum(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust'::text)) THEN results.mean_time_ns ELSE NULL::bigint END)), 4) AS simd_to_rust_ratio,
+    round(((sum(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust'::text)) THEN results.mean_time_ns ELSE NULL::bigint END) / (max(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust_SIMD'::text)) THEN results.mean_time_ns ELSE NULL::bigint END))::numeric) * (100)::numeric), 2) AS simd_vs_rust_percent_improvement,
+    round((sum(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust'::text)) THEN results.mean_time_ns ELSE NULL::bigint END) / (max(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust_SIMD'::text)) THEN results.mean_time_ns ELSE NULL::bigint END))::numeric), 2) AS simd_speedup_factor
    FROM ((benchmark_runs runs
      JOIN benchmark_results results ON ((runs.id = results.run_id)))
      JOIN indicators ind ON ((results.indicator_id = ind.id)))
-  WHERE ((results.implementation_type)::text = ANY ((ARRAY['Rust'::character varying, 'Rust_SIMD'::character varying])::text[]))
+  WHERE (lower((results.implementation_type)::text) = ANY ((ARRAY['rust'::character varying, 'rust_simd'::character varying])::text[]))
   GROUP BY runs.id, runs.run_timestamp, runs.system_info, ind.name, results.stock_symbol, results.data_source, results.input_size
- HAVING ((sum(CASE WHEN ((results.implementation_type)::text = 'Rust'::text) THEN 1 ELSE 0 END) > 0) AND (sum(CASE WHEN ((results.implementation_type)::text = 'Rust_SIMD'::text) THEN 1 ELSE 0 END) > 0))
+ HAVING ((sum(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust'::text)) THEN 1 ELSE 0 END) > 0) AND (sum(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust_SIMD'::text)) THEN 1 ELSE 0 END) > 0))
   ORDER BY runs.run_timestamp DESC, ind.name, results.stock_symbol;
 
 CREATE VIEW rust_simd_asset_performance_comparison AS
 SELECT runs.id AS run_id,
     runs.run_timestamp AS benchmark_date,
-    (runs.system_info ->> 'hostname'::text) AS hostname,
+    lower(runs.system_info ->> 'hostname'::text) AS hostname,
     ind.name AS indicator_name,
     results.options,
     results.data_source,
-    sum(CASE WHEN ((results.implementation_type)::text = 'Rust'::text) THEN results.mean_time_ns ELSE (0)::bigint END) AS rust_total_mean_time_ns,
-    sum(CASE WHEN ((results.implementation_type)::text = 'C_tulip'::text) THEN results.mean_time_ns ELSE (0)::bigint END) AS c_tulip_total_mean_time_ns,
-    sum(CASE WHEN ((results.implementation_type)::text = 'talib'::text) THEN results.mean_time_ns ELSE (0)::bigint END) AS talib_total_mean_time_ns,
-    avg(CASE WHEN ((results.implementation_type)::text = 'Rust_SIMD_by_assets'::text) THEN results.mean_time_ns ELSE NULL::bigint END) AS rust_simd_asset_mean_time_ns,
-    round((avg(CASE WHEN ((results.implementation_type)::text = 'Rust_SIMD_by_assets'::text) THEN results.mean_time_ns ELSE NULL::bigint END) / NULLIF(sum(CASE WHEN ((results.implementation_type)::text = 'Rust'::text) THEN results.mean_time_ns ELSE (0)::bigint END), (0)::numeric)), 4) AS simd_asset_to_rust_ratio,
-    round(((NULLIF(sum(CASE WHEN ((results.implementation_type)::text = 'Rust'::text) THEN results.mean_time_ns ELSE (0)::bigint END), (0)::numeric) / avg(CASE WHEN ((results.implementation_type)::text = 'Rust_SIMD_by_assets'::text) THEN results.mean_time_ns ELSE NULL::bigint END)) * (100)::numeric), 2) AS simd_asset_vs_rust_percent_improvement,
-    round(((NULLIF(sum(CASE WHEN ((results.implementation_type)::text = 'C_tulip'::text) THEN results.mean_time_ns ELSE (0)::bigint END), (0)::numeric) / avg(CASE WHEN ((results.implementation_type)::text = 'Rust_SIMD_by_assets'::text) THEN results.mean_time_ns ELSE NULL::bigint END)) * (100)::numeric), 2) AS simd_asset_vs_c_tulip_percent_improvement,
-    round(((NULLIF(sum(CASE WHEN ((results.implementation_type)::text = 'talib'::text) THEN results.mean_time_ns ELSE (0)::bigint END), (0)::numeric) / avg(CASE WHEN ((results.implementation_type)::text = 'Rust_SIMD_by_assets'::text) THEN results.mean_time_ns ELSE NULL::bigint END)) * (100)::numeric), 2) AS simd_asset_vs_talib_percent_improvement
+    sum(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust'::text)) THEN results.mean_time_ns ELSE (0)::bigint END) AS rust_total_mean_time_ns,
+    sum(CASE WHEN (lower((results.implementation_type)::text) = lower('C_tulip'::text)) THEN results.mean_time_ns ELSE (0)::bigint END) AS c_tulip_total_mean_time_ns,
+    sum(CASE WHEN (lower((results.implementation_type)::text) = lower('talib'::text)) THEN results.mean_time_ns ELSE (0)::bigint END) AS talib_total_mean_time_ns,
+    avg(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust_SIMD_by_assets'::text)) THEN results.mean_time_ns ELSE NULL::bigint END) AS rust_simd_asset_mean_time_ns,
+    round((avg(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust_SIMD_by_assets'::text)) THEN results.mean_time_ns ELSE NULL::bigint END) / NULLIF(sum(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust'::text)) THEN results.mean_time_ns ELSE (0)::bigint END), (0)::numeric)), 4) AS simd_asset_to_rust_ratio,
+    round(((NULLIF(sum(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust'::text)) THEN results.mean_time_ns ELSE (0)::bigint END), (0)::numeric) / avg(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust_SIMD_by_assets'::text)) THEN results.mean_time_ns ELSE NULL::bigint END)) * (100)::numeric), 2) AS simd_asset_vs_rust_percent_improvement,
+    round(((NULLIF(sum(CASE WHEN (lower((results.implementation_type)::text) = lower('C_tulip'::text)) THEN results.mean_time_ns ELSE (0)::bigint END), (0)::numeric) / avg(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust_SIMD_by_assets'::text)) THEN results.mean_time_ns ELSE NULL::bigint END)) * (100)::numeric), 2) AS simd_asset_vs_c_tulip_percent_improvement,
+    round(((NULLIF(sum(CASE WHEN (lower((results.implementation_type)::text) = lower('talib'::text)) THEN results.mean_time_ns ELSE (0)::bigint END), (0)::numeric) / avg(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust_SIMD_by_assets'::text)) THEN results.mean_time_ns ELSE NULL::bigint END)) * (100)::numeric), 2) AS simd_asset_vs_talib_percent_improvement
    FROM ((benchmark_runs runs
      JOIN benchmark_results results ON ((runs.id = results.run_id)))
      JOIN indicators ind ON ((results.indicator_id = ind.id)))
-  WHERE ((results.implementation_type)::text = ANY ((ARRAY['Rust'::character varying, 'C_tulip'::character varying, 'talib'::character varying, 'Rust_SIMD_by_assets'::character varying])::text[]))
+  WHERE (lower((results.implementation_type)::text) = ANY ((ARRAY['rust'::character varying, 'c_tulip'::character varying, 'talib'::character varying, 'rust_simd_by_assets'::character varying])::text[]))
   GROUP BY runs.id, runs.run_timestamp, runs.system_info, ind.name, results.options, results.data_source
- HAVING ((avg(CASE WHEN ((results.implementation_type)::text = 'Rust_SIMD_by_assets'::text) THEN results.mean_time_ns ELSE NULL::bigint END) IS NOT NULL) AND ((sum(CASE WHEN ((results.implementation_type)::text = 'Rust'::text) THEN 1 ELSE 0 END) > 0) OR (sum(CASE WHEN ((results.implementation_type)::text = 'C_tulip'::text) THEN 1 ELSE 0 END) > 0) OR (sum(CASE WHEN ((results.implementation_type)::text = 'talib'::text) THEN 1 ELSE 0 END) > 0)))
+ HAVING ((avg(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust_SIMD_by_assets'::text)) THEN results.mean_time_ns ELSE NULL::bigint END) IS NOT NULL) AND ((sum(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust'::text)) THEN 1 ELSE 0 END) > 0) OR (sum(CASE WHEN (lower((results.implementation_type)::text) = lower('C_tulip'::text)) THEN 1 ELSE 0 END) > 0) OR (sum(CASE WHEN (lower((results.implementation_type)::text) = lower('talib'::text)) THEN 1 ELSE 0 END) > 0)))
   ORDER BY runs.run_timestamp DESC, ind.name, results.options;
 
 CREATE VIEW rust_simd_c_tulip_performance_comparison AS
 SELECT runs.id AS run_id,
     runs.run_timestamp AS benchmark_date,
-    (runs.system_info ->> 'hostname'::text) AS hostname,
+    lower(runs.system_info ->> 'hostname'::text) AS hostname,
     ind.name AS indicator_name,
     results.stock_symbol,
     results.data_source,
     results.input_size,
-    max(CASE WHEN ((results.implementation_type)::text = 'Rust_SIMD'::text) THEN results.mean_time_ns ELSE NULL::bigint END) AS rust_simd_mean_time_ns,
-    max(CASE WHEN ((results.implementation_type)::text = 'Rust_SIMD'::text) THEN results.sample_count ELSE NULL::integer END) AS rust_simd_sample_count,
-    sum(CASE WHEN ((results.implementation_type)::text = 'C_tulip'::text) THEN results.mean_time_ns ELSE NULL::bigint END) AS c_tulip_total_mean_time_ns,
-    count(CASE WHEN ((results.implementation_type)::text = 'C_tulip'::text) THEN 1 ELSE NULL::integer END) AS c_tulip_options_count,
-    round((sum(CASE WHEN ((results.implementation_type)::text = 'C_tulip'::text) THEN results.mean_time_ns ELSE NULL::bigint END) / (max(CASE WHEN ((results.implementation_type)::text = 'Rust_SIMD'::text) THEN results.mean_time_ns ELSE NULL::bigint END))::numeric), 4) AS c_tulip_to_simd_ratio,
-    round(((sum(CASE WHEN ((results.implementation_type)::text = 'C_tulip'::text) THEN results.mean_time_ns ELSE NULL::bigint END) / (max(CASE WHEN ((results.implementation_type)::text = 'Rust_SIMD'::text) THEN results.mean_time_ns ELSE NULL::bigint END))::numeric) * (100)::numeric), 2) AS simd_vs_c_tulip_percent_improvement,
-    round((sum(CASE WHEN ((results.implementation_type)::text = 'C_tulip'::text) THEN results.mean_time_ns ELSE NULL::bigint END) / (max(CASE WHEN ((results.implementation_type)::text = 'Rust_SIMD'::text) THEN results.mean_time_ns ELSE NULL::bigint END))::numeric), 2) AS simd_speedup_vs_c_tulip
+    max(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust_SIMD'::text)) THEN results.mean_time_ns ELSE NULL::bigint END) AS rust_simd_mean_time_ns,
+    max(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust_SIMD'::text)) THEN results.sample_count ELSE NULL::integer END) AS rust_simd_sample_count,
+    sum(CASE WHEN (lower((results.implementation_type)::text) = lower('C_tulip'::text)) THEN results.mean_time_ns ELSE NULL::bigint END) AS c_tulip_total_mean_time_ns,
+    count(CASE WHEN (lower((results.implementation_type)::text) = lower('C_tulip'::text)) THEN 1 ELSE NULL::integer END) AS c_tulip_options_count,
+    round((sum(CASE WHEN (lower((results.implementation_type)::text) = lower('C_tulip'::text)) THEN results.mean_time_ns ELSE NULL::bigint END) / (max(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust_SIMD'::text)) THEN results.mean_time_ns ELSE NULL::bigint END))::numeric), 4) AS c_tulip_to_simd_ratio,
+    round(((sum(CASE WHEN (lower((results.implementation_type)::text) = lower('C_tulip'::text)) THEN results.mean_time_ns ELSE NULL::bigint END) / (max(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust_SIMD'::text)) THEN results.mean_time_ns ELSE NULL::bigint END))::numeric) * (100)::numeric), 2) AS simd_vs_c_tulip_percent_improvement,
+    round((sum(CASE WHEN (lower((results.implementation_type)::text) = lower('C_tulip'::text)) THEN results.mean_time_ns ELSE NULL::bigint END) / (max(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust_SIMD'::text)) THEN results.mean_time_ns ELSE NULL::bigint END))::numeric), 2) AS simd_speedup_vs_c_tulip
    FROM ((benchmark_runs runs
      JOIN benchmark_results results ON ((runs.id = results.run_id)))
      JOIN indicators ind ON ((results.indicator_id = ind.id)))
-  WHERE ((results.implementation_type)::text = ANY ((ARRAY['Rust_SIMD'::character varying, 'C_tulip'::character varying])::text[]))
+  WHERE (lower((results.implementation_type)::text) = ANY ((ARRAY['rust_simd'::character varying, 'c_tulip'::character varying])::text[]))
   GROUP BY runs.id, runs.run_timestamp, runs.system_info, ind.name, results.stock_symbol, results.data_source, results.input_size
- HAVING ((sum(CASE WHEN ((results.implementation_type)::text = 'Rust_SIMD'::text) THEN 1 ELSE 0 END) > 0) AND (sum(CASE WHEN ((results.implementation_type)::text = 'C_tulip'::text) THEN 1 ELSE 0 END) > 0))
+ HAVING ((sum(CASE WHEN (lower((results.implementation_type)::text) = lower('Rust_SIMD'::text)) THEN 1 ELSE 0 END) > 0) AND (sum(CASE WHEN (lower((results.implementation_type)::text) = lower('C_tulip'::text)) THEN 1 ELSE 0 END) > 0))
   ORDER BY runs.run_timestamp DESC, ind.name, results.stock_symbol;
 
 -- Level 2: reference level-1 views
