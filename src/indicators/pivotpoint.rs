@@ -111,7 +111,9 @@ pub fn indicator(
         inputs[2].as_slice()?,
     ];
 
-    let options_array: [f64; OPTIONS] = [options[0], options[1]];
+    let options_array: [f64; OPTIONS] = options
+        .try_into()
+        .unwrap_or_else(|_| unreachable!("options length already validated"));
 
     match PivotPoint::indicator(&input_arrays, &options_array, optional_outputs.as_deref()) {
         Ok((result, state)) => Ok((
@@ -140,7 +142,9 @@ pub fn min_data(options: Vec<f64>) -> PyResult<usize> {
         )));
     }
 
-    let options_array: [f64; OPTIONS] = [options[0], options[1]];
+    let options_array: [f64; OPTIONS] = options
+        .try_into()
+        .unwrap_or_else(|_| unreachable!("options length already validated"));
     Ok(PivotPoint::min_data(&options_array))
 }
 
@@ -220,7 +224,9 @@ pub fn simd_by_assets(
     // Create array of references for the by_assets function
     let input_refs: Vec<&[&[f64]; INPUTS]> = asset_input_arrays.iter().collect();
 
-    let options_array: [f64; OPTIONS] = [options[0], options[1]];
+    let options_array: [f64; OPTIONS] = options
+        .try_into()
+        .unwrap_or_else(|_| unreachable!("options length already validated"));
 
     // Call the SIMD by assets function with proper const generic
     let result = match num_assets {
@@ -340,7 +346,11 @@ pub fn simd_by_options(
     let mut option_arrays: Vec<[f64; OPTIONS]> = Vec::with_capacity(num_options);
 
     for opt in &options {
-        option_arrays.push([opt[0], opt[1]]);
+        let opt_array: [f64; OPTIONS] = opt
+            .clone()
+            .try_into()
+            .unwrap_or_else(|_| unreachable!("options length already validated"));
+        option_arrays.push(opt_array);
     }
 
     let option_refs: Vec<&[f64; OPTIONS]> = option_arrays.iter().collect();
