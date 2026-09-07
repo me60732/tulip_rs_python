@@ -1,6 +1,6 @@
 [package]
 name = "tulip_rs_python"
-version = "0.2.3"
+version = "0.2.5"
 edition = "2021"
 description = "Python bindings for TulipRS - Technical Analysis Library"
 license = "MIT"
@@ -18,7 +18,7 @@ pyo3 = { version = "0.28", features = ["extension-module"] }
 numpy = "0.28"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-tulip_rs = { git = "https://github.com/me60732/tulip_rs.git", tag = "v0.2.3", default-features = true }
+tulip_rs = { git = "https://github.com/me60732/tulip_rs.git", tag = "v0.2.5", default-features = true }
 #tulip_rs = { path = "../tulip_rs/tulip_rs", default-features = true }
 [build-dependencies]
 pyo3-build-config = "0.28"

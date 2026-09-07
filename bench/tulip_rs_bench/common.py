@@ -222,7 +222,14 @@ def load_stock_data() -> List[OhlcvArrays]:
 
 
 class BenchmarkLogger:
-    """Writes timing results to the indicator_benchmark Postgres database."""
+    """Writes timing results to the indicator_benchmark Postgres database.
+
+    The DB lives on a remote network host, so a run of hundreds of log()
+    calls can hit a transient dropped connection. On OperationalError /
+    InterfaceError we reconnect once and retry once before giving up on
+    that single write — a dropped result row shouldn't abort the whole
+    benchmark run.
+    """
 
     def __init__(self) -> None:
         self.conn = psycopg2.connect(BENCH_DB_URL)
@@ -230,11 +237,51 @@ class BenchmarkLogger:
         self._cache: Dict[str, int] = {}
         self._load_indicators()
 
+    def _reconnect(self) -> None:
+        try:
+            self.conn.close()
+        except Exception:
+            pass
+        self.conn = psycopg2.connect(BENCH_DB_URL)
+
+    def _with_retry(self, label: str, fn: Callable[[], Any]) -> Any:
+        """Run fn() against self.conn; on connection loss, reconnect and retry once."""
+        try:
+            return fn()
+        except (psycopg2.OperationalError, psycopg2.InterfaceError) as exc:
+            print(
+                f"[warn] {label}: connection error ({exc}); reconnecting and retrying once",
+                file=sys.stderr,
+            )
+            try:
+                self.conn.rollback()
+            except Exception:
+                pass
+            try:
+                self._reconnect()
+            except Exception as exc_reconnect:
+                print(
+                    f"[warn] {label}: reconnect failed ({exc_reconnect}); skipping this write",
+                    file=sys.stderr,
+                )
+                return None
+            try:
+                return fn()
+            except (psycopg2.OperationalError, psycopg2.InterfaceError) as exc2:
+                print(
+                    f"[warn] {label}: retry failed ({exc2}); skipping this write",
+                    file=sys.stderr,
+                )
+                return None
+
     def _load_indicators(self) -> None:
-        with self.conn.cursor() as cur:
-            cur.execute("SELECT id, name FROM indicators")
-            for iid, name in cur.fetchall():
-                self._cache[name] = iid
+        def _do() -> None:
+            with self.conn.cursor() as cur:
+                cur.execute("SELECT id, name FROM indicators")
+                for iid, name in cur.fetchall():
+                    self._cache[name] = iid
+
+        self._with_retry("_load_indicators", _do)
 
     def start_run(
         self, notes: str = "Python benchmarks — tulip_rs_python vs ta"
@@ -248,13 +295,17 @@ class BenchmarkLogger:
             "hostname": socket.gethostname(),
             "python_version": sys.version.split()[0],
         }
-        with self.conn.cursor() as cur:
-            cur.execute(
-                "INSERT INTO benchmark_runs (notes, system_info) VALUES (%s, %s) RETURNING id",
-                (notes, psycopg2.extras.Json(system_info)),
-            )
-            self.run_id = cur.fetchone()[0]
-        self.conn.commit()
+
+        def _do() -> None:
+            with self.conn.cursor() as cur:
+                cur.execute(
+                    "INSERT INTO benchmark_runs (notes, system_info) VALUES (%s, %s) RETURNING id",
+                    (notes, psycopg2.extras.Json(system_info)),
+                )
+                self.run_id = cur.fetchone()[0]
+            self.conn.commit()
+
+        self._with_retry("start_run", _do)
         print(f"  benchmark run id: {self.run_id}")
 
     def log(
@@ -273,33 +324,40 @@ class BenchmarkLogger:
                 file=sys.stderr,
             )
             return
-        with self.conn.cursor() as cur:
-            cur.execute(
-                """
-                INSERT INTO benchmark_results
-                    (run_id, indicator_id, implementation_type, stock_symbol,
-                     data_source, options, mean_time_ns, std_dev_ns,
-                     min_time_ns, max_time_ns, sample_count, input_size)
-                VALUES (%s,%s,%s,%s,'real_data',%s,%s,%s,%s,%s,%s,%s)
-                """,
-                (
-                    self.run_id,
-                    iid,
-                    impl_type,
-                    symbol,
-                    psycopg2.extras.Json(options),
-                    timing.mean_ns,
-                    timing.stddev_ns,
-                    timing.min_ns,
-                    timing.max_ns,
-                    timing.sample_count,
-                    input_size,
-                ),
-            )
-        self.conn.commit()
+
+        def _do() -> None:
+            with self.conn.cursor() as cur:
+                cur.execute(
+                    """
+                    INSERT INTO benchmark_results
+                        (run_id, indicator_id, implementation_type, stock_symbol,
+                         data_source, options, mean_time_ns, std_dev_ns,
+                         min_time_ns, max_time_ns, sample_count, input_size)
+                    VALUES (%s,%s,%s,%s,'real_data',%s,%s,%s,%s,%s,%s,%s)
+                    """,
+                    (
+                        self.run_id,
+                        iid,
+                        impl_type,
+                        symbol,
+                        psycopg2.extras.Json(options),
+                        timing.mean_ns,
+                        timing.stddev_ns,
+                        timing.min_ns,
+                        timing.max_ns,
+                        timing.sample_count,
+                        input_size,
+                    ),
+                )
+            self.conn.commit()
+
+        self._with_retry(f"log({indicator_name}/{impl_type}/{symbol})", _do)
 
     def close(self) -> None:
-        self.conn.close()
+        try:
+            self.conn.close()
+        except Exception:
+            pass
 
 
 # ---------------------------------------------------------------------------

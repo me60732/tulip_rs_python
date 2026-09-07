@@ -245,7 +245,7 @@ pub fn candlestick(
         close.as_slice()?,
     ];
 
-    match rust_cdl::indicator(&inputs, &opts, ft) {
+    match rust_cdl::CandleStick::indicator(&inputs, &opts, ft) {
         Ok((output, state)) => Ok((
             convert_output(output),
             CandlestickState {
@@ -272,7 +272,7 @@ pub fn candlestick(
 #[pyo3(signature = (options=None))]
 pub fn min_data(options: Option<Vec<f64>>) -> PyResult<usize> {
     let opts = resolve_options(options)?;
-    Ok(rust_cdl::min_data(&opts))
+    Ok(rust_cdl::CandleStick::min_data(&opts))
 }
 
 /// Return indicator metadata as a dict.
@@ -286,7 +286,7 @@ pub fn min_data(options: Option<Vec<f64>>) -> PyResult<usize> {
 ///     Candle Stick Indicator
 #[pyfunction]
 pub fn info(py: Python<'_>) -> PyResult<Bound<'_, pyo3::types::PyDict>> {
-    crate::utils::info_to_pydict(py, rust_cdl::INFO)
+    crate::utils::info_to_pydict(py, rust_cdl::CandleStick::INFO)
 }
 
 // ---------------------------------------------------------------------------

@@ -6,6 +6,8 @@ Installed as the `tulip-rs-bench` console script via pyproject.toml.
 Usage:
     tulip-rs-bench                   # all indicators, stdout only
     tulip-rs-bench ema rsi macd      # specific indicators
+    tulip-rs-bench psar+             # psar and everything after it, alphabetically
+    tulip-rs-bench psar+ ema         # range start plus an extra specific indicator
     BENCHMARK_LOG_TO_DB=1 tulip-rs-bench   # write to indicator_benchmark DB
     python -m tulip_rs_bench.run_all       # equivalent alternative
 """
@@ -46,6 +48,54 @@ def _discover() -> list[tuple[str, BenchmarkDef]]:
     return found
 
 
+def _filter_benchmarks(
+    all_benchmarks: list[tuple[str, BenchmarkDef]], filter_names: list[str]
+) -> list[tuple[str, BenchmarkDef]]:
+    """
+    Select benchmarks from filter_names.
+
+    Plain names (e.g. "ema") match a single indicator by BenchmarkDef.name.
+    A name suffixed with "+" (e.g. "psar+") is a range start: it selects
+    that indicator and every indicator after it in alphabetical order
+    (by BenchmarkDef.name), letting you resume a long run from where it
+    left off. Range starts and plain names can be combined freely; results
+    are de-duplicated and preserve discovery order for plain names and
+    alphabetical order for range-selected indicators.
+    """
+    range_starts = [n[:-1] for n in filter_names if n.endswith("+")]
+    exact_names = [n for n in filter_names if not n.endswith("+")]
+
+    selected: list[tuple[str, BenchmarkDef]] = []
+    seen: set[str] = set()
+
+    if range_starts:
+        by_name = sorted(all_benchmarks, key=lambda nb: nb[1].name.lower())
+        for start in range_starts:
+            start_lower = start.lower()
+            idx = next(
+                (i for i, (_n, b) in enumerate(by_name) if b.name.lower() == start_lower),
+                None,
+            )
+            if idx is None:
+                print(
+                    f"[error] No benchmark named '{start}' found for range start '{start}+'",
+                    file=sys.stderr,
+                )
+                sys.exit(1)
+            for n, b in by_name[idx:]:
+                if b.name not in seen:
+                    seen.add(b.name)
+                    selected.append((n, b))
+
+    if exact_names:
+        for n, b in all_benchmarks:
+            if b.name in exact_names and b.name not in seen:
+                seen.add(b.name)
+                selected.append((n, b))
+
+    return selected
+
+
 def main(filter_names: list[str] | None = None) -> None:
     # When invoked as a console script the entry point calls main() with no
     # arguments, so fall back to reading sys.argv directly.
@@ -72,7 +122,7 @@ def main(filter_names: list[str] | None = None) -> None:
     print("\n[3/3] Running benchmarks …")
     all_benchmarks = _discover()
     if filter_names:
-        all_benchmarks = [(n, b) for n, b in all_benchmarks if b.name in filter_names]
+        all_benchmarks = _filter_benchmarks(all_benchmarks, filter_names)
         if not all_benchmarks:
             print(f"[error] No benchmarks matched: {filter_names}", file=sys.stderr)
             sys.exit(1)
